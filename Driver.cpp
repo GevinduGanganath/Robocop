@@ -1,8 +1,6 @@
 #include "Arduino.h"
 #include "Driver.h"
 
-// error parameter add to remove the wheel unbalance. Not working well
-
 Driver::Driver(int enR, int inR1, int inR2, int enL, int inL1, int inL2, int error){
     _enR = enR;
     _inR1 = inR1;
@@ -33,13 +31,23 @@ void Driver::moveForward(int speed){
 }
 
 void Driver::turnRight(int speed){
-  analogWrite(_enR, 0);
+  analogWrite(_enR, (int)speed/2);
   analogWrite(_enL, speed+_error);
 }
 
 void Driver::turnLeft(int speed){
   analogWrite(_enR, speed);
-  analogWrite(_enL, 0);
+  analogWrite(_enL, (int)(speed+_error)/2);
+}
+
+void Driver::turnRight90(){
+  turnRight();
+  delay(735);
+}
+
+void Driver::turnLeft90(){
+  turnLeft();
+  delay(1075);
 }
 
 void Driver::hold(){
