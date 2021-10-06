@@ -4,20 +4,12 @@ Driver Driver(5, 6, 7, 8, 9, 10);
 
 void setup(){
   Driver.begin();
+  delay(1000);
+  //Driver.moveForward();
+  //delay(3000);
+  //Driver.hold();
+  Driver.lineFollow(12, 4, 3, 11, 14);
   
-  Driver.moveForward();
-  delay(1000);
-  Driver.turnLeft();
-  delay(300);
-  Driver.moveForward();
-  delay(1000);
-  Driver.turnRight();
-  delay(300);
-  Driver.moveForward();
-  delay(1000);
-  Driver.hold();
- 
-  Driver.hold();
   
   }
 

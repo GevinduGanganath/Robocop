@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include "Driver.h"
 
-Driver::Driver(int enR, int inR1, int inR2, int enL, int inL1, int inL2, int error){
+Driver::Driver(byte enR, byte inR1, byte inR2, byte enL, byte inL1, byte inL2, byte error){
     _enR = enR;
     _inR1 = inR1;
     _inR2 = inR2;
@@ -53,4 +53,57 @@ void Driver::turnLeft90(){
 void Driver::hold(){
   analogWrite(_enR, 0);
   analogWrite(_enL, 0);
+}
+
+void Driver::readIR(){
+  _frontSensorVal = digitalRead(_frontSensor);
+  _backSensorVal = digitalRead(_backSensor);
+  _rightSensorVal = digitalRead(_rightSensor);
+  _leftSensorVal = digitalRead(_leftSensor);
+}
+
+void Driver::lineFollow(byte frontSensor, byte backSensor, byte rightSensor, byte leftSensor, byte sensorPower){
+
+  _frontSensor = frontSensor;
+  _backSensor = backSensor;
+  _rightSensor = rightSensor;
+  _leftSensor = leftSensor;
+  _sensorPower = sensorPower;
+
+  pinMode(_frontSensor, INPUT);
+  pinMode(_backSensor, INPUT);
+  pinMode(_rightSensor, INPUT);
+  pinMode(_leftSensor, INPUT);
+  pinMode(_sensorPower, OUTPUT);
+
+  digitalWrite(_sensorPower, HIGH);
+
+  // black 1
+  // white 0
+  Serial.begin(9600);
+  while (1){
+    readIR();
+    if ((_frontSensorVal == 0 or _backSensorVal == 0) && _rightSensorVal == 1 && _leftSensorVal == 1){
+      Serial.println("Forward");
+      moveForward();
+    }
+    else if ((_frontSensorVal == 0 or _backSensorVal == 0) && _rightSensorVal == 0 && _leftSensorVal == 1){
+      Serial.println("Turn right");
+      turnRight();
+    }
+    else if ((_frontSensorVal == 0 or _backSensorVal == 0) && _rightSensorVal == 1 && _leftSensorVal == 0){
+      Serial.println("Turn left");
+      turnLeft();
+    }
+    else if (_frontSensorVal == 1 && _backSensorVal == 1){   //due to error in front sensor calibration. otherwise not needed
+      Serial.println("Forward");
+      moveForward();
+    }
+   else if ((_frontSensorVal == 0 or _backSensorVal == 0) && _rightSensorVal == 0 && _leftSensorVal == 0){
+      Serial.println("Hold");
+      hold();
+      //break;
+    }
+  }
+  digitalWrite(_sensorPower, LOW);
 }
